@@ -2,7 +2,7 @@
 
 ### Open Source Sports Coaching Ecosystem
 
-> 🚀 **[ACCÉDER À LA PRÉSENTATION INTERACTIVE ET AU WBS GRAPHIQUE](https://ton-pseudo.github.io/ton-repo/)**
+> 🚀 **[ACCÉDER À LA PRÉSENTATION INTERACTIVE ET AU WBS GRAPHIQUE](https://hugopotable.github.io/Akhuna/)**
 > *Ce tableau de bord interactif présente la vision, la structure détaillée et la roadmap du projet.*
 
 ---
