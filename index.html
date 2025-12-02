@@ -3,487 +3,509 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akhuna - Dashboard Dark Mode</title>
+    <title>Akhuna - Ecosystème Sport & Santé</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Phosphor Icons pour un look pro/app mobile -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;600;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
-            color: #e2e8f0; /* Slate 200 */
+            background-color: #0f172a; /* Slate 900 - Fond Intouché */
+            color: #e2e8f0;
             overflow-x: hidden;
         }
 
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
+        /* Police "Chrono/Tech" pour les titres et chiffres */
+        .font-sport {
+            font-family: 'Chakra Petch', sans-serif;
         }
 
-        /* --- Animations --- */
+        /* --- Animations Fluides --- */
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .animate-fade-up {
-            animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; /* Easing Apple-like */
             opacity: 0;
+        }
+
+        .animate-heartbeat {
+            animation: heartbeat 2s ease-in-out infinite;
         }
         
         .delay-100 { animation-delay: 100ms; }
         .delay-200 { animation-delay: 200ms; }
         .delay-300 { animation-delay: 300ms; }
 
-        /* --- Glassmorphism Cards --- */
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* --- Glassmorphism UI (Style Fitness App) --- */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem; /* Coins plus arrondis comme les apps mobiles */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(16, 185, 129, 0.5); /* Emerald border on hover */
-            box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.15); /* Green glow */
+        .glass-panel:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.1);
         }
 
-        /* --- Chart Containers (Mandatory) --- */
-        .chart-container {
+        /* --- Chart Containers --- */
+        .chart-wrapper {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 400px;
-            max-height: 400px;
-            background: rgba(15, 23, 42, 0.5); /* Darker inner bg */
-            border-radius: 0.5rem;
-            padding: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 300px;
-            }
-        }
-
-        .plotly-container {
-            width: 100%;
             height: 100%;
+            min-height: 350px;
         }
 
-        /* --- Scrollbar --- */
+        /* --- Scrollbar invisible mais fonctionnelle --- */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
             background: #334155;
-            border-radius: 4px;
+            border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
+
+        /* --- UI Elements --- */
+        .stat-value {
+            background: linear-gradient(to right, #34d399, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
             background: #10b981;
+            border-radius: 2px;
         }
-
-        /* --- Utilities --- */
-        .text-glow {
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-        }
-        
-        .bg-gradient-radial {
-            background-image: radial-gradient(circle at center, var(--tw-gradient-stops));
-        }
-
     </style>
-    <!-- Chosen Palette: "Cyber Sport" - Dark Slate Background (#0f172a) with Emerald Neon Accents (#10b981) for a modern, tech-focused aesthetic. -->
 </head>
-<body class="bg-slate-950 selection:bg-emerald-500 selection:text-white relative">
+<body class="bg-slate-950 selection:bg-emerald-500 selection:text-slate-900 relative">
 
-    <!-- Background Gradient Blob -->
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+    <!-- Orbes de fond (Ambiance Sportive Dynamique) -->
+    <div class="fixed top-0 left-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none animate-heartbeat"></div>
+    <div class="fixed bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
 
-    <!-- Application Structure Plan:
-         Modern SPA dashboard structure maintained but styled for "Dark Mode" impact.
-         1. Floating Navbar: Glassmorphic header for navigation.
-         2. Hero: High-impact typography with glowing accents.
-         3. Bento Grid Context: A modern grid layout for key project values.
-         4. WBS Interactive Module: Sunburst chart adapted for dark themes (light text, vibrant colors).
-         5. Neon Timeline: Roadmap with glowing timeline nodes.
-         6. Data Viz: Radar and Doughnut charts with dark-theme optimized configs.
-    -->
-
-    <!-- Navbar -->
-    <nav class="fixed top-4 left-0 right-0 z-50 px-4">
-        <div class="max-w-5xl mx-auto glass-card px-6 py-3 flex justify-between items-center shadow-2xl shadow-black/50">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-xl font-bold tracking-tight text-white font-mono">Akhuna<span class="text-emerald-400">.io</span></span>
+    <!-- Navigation Flottante -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-4xl">
+        <div class="glass-panel px-6 py-3 flex justify-between items-center shadow-2xl">
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-barbell text-emerald-400 text-2xl"></i>
+                <span class="text-xl font-sport font-bold tracking-wide text-white">AKHUNA<span class="text-emerald-400">.FIT</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-8">
-                <button onclick="scrollToSection('context')" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">Contexte</button>
-                <button onclick="scrollToSection('wbs')" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">Structure</button>
-                <button onclick="scrollToSection('roadmap')" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">Roadmap</button>
+                <a href="#vision" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1"><i class="ph ph-eye"></i> Vision</a>
+                <a href="#structure" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1"><i class="ph ph-tree-structure"></i> WBS</a>
+                <a href="#roadmap" class="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1"><i class="ph ph-path"></i> Roadmap</a>
             </div>
-            <span class="hidden md:inline-flex px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-mono font-bold">
-                PHASE 1 : INIT
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span class="text-xs font-mono font-bold text-emerald-400 tracking-wider">LIVE STATUS</span>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 space-y-24">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-20 space-y-32">
 
-        <!-- Hero Section -->
-        <section class="text-center space-y-6 animate-fade-up">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-emerald-400 text-sm font-medium mb-4">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                Projet de Fin d'Études Epitech
+        <!-- Hero Section: Performance Dashboard Style -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-fade-up">
+            <div class="space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-emerald-400 text-xs font-bold uppercase tracking-widest">
+                    <i class="ph-fill ph-lightning"></i> Epitech End of Study Project
+                </div>
+                <h1 class="text-5xl md:text-7xl font-sport font-bold text-white leading-tight">
+                    L'Open Source au service de la <span class="stat-value">Performance.</span>
+                </h1>
+                <p class="text-lg text-slate-400 leading-relaxed max-w-lg">
+                    Akhuna brise les chaînes des plateformes propriétaires. Une solution complète, modulaire et gratuite pour les coachs qui veulent reprendre le contrôle de leurs données.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <div class="glass-panel px-6 py-4 flex items-center gap-3">
+                        <div class="p-2 bg-emerald-500/20 rounded-lg text-emerald-400"><i class="ph-fill ph-users-three text-xl"></i></div>
+                        <div>
+                            <div class="text-2xl font-sport font-bold text-white">7</div>
+                            <div class="text-xs text-slate-400 uppercase">Ingénieurs</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel px-6 py-4 flex items-center gap-3">
+                        <div class="p-2 bg-blue-500/20 rounded-lg text-blue-400"><i class="ph-fill ph-hourglass-high text-xl"></i></div>
+                        <div>
+                            <div class="text-2xl font-sport font-bold text-white">24</div>
+                            <div class="text-xs text-slate-400 uppercase">Mois</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-2">
-                Codez vos <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 text-glow">Performances</span>
-            </h1>
-            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                Le premier écosystème de coaching sportif <strong class="text-white">100% Open-Source</strong>.
-                <br>Une alternative libre aux géants propriétaires.
-            </p>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mt-8 font-mono text-sm">
-                <div class="glass-card p-4 text-center">
-                    <div class="text-2xl mb-1">👨‍💻</div>
-                    <div class="text-emerald-400 font-bold">7 Étudiants</div>
+            <!-- Hero Visual: Abstract Tech/Sport Representation -->
+            <div class="relative">
+                <div class="glass-panel p-6 border-emerald-500/20 relative z-10 overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20"><i class="ph-fill ph-heartbeat text-9xl text-emerald-500"></i></div>
+                    <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><i class="ph-fill ph-activity text-emerald-400"></i> Métriques du Projet</h3>
+                    
+                    <div class="space-y-5">
+                        <!-- Metric 1 -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-400">Faisabilité Technique</span>
+                                <span class="text-emerald-400 font-mono">94%</span>
+                            </div>
+                            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 w-[94%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                            </div>
+                        </div>
+                        <!-- Metric 2 -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-400">Impact Communautaire</span>
+                                <span class="text-blue-400 font-mono">88%</span>
+                            </div>
+                            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 w-[88%] rounded-full"></div>
+                            </div>
+                        </div>
+                         <!-- Metric 3 -->
+                         <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-400">Innovation UX</span>
+                                <span class="text-purple-400 font-mono">92%</span>
+                            </div>
+                            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 w-[92%] rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-sport font-bold text-white">100%</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wider">Open Source</div>
+                        </div>
+                        <div class="text-center border-l border-white/5">
+                            <div class="text-3xl font-sport font-bold text-white">0€</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wider">Coût Licence</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="glass-card p-4 text-center">
-                    <div class="text-2xl mb-1">⏳</div>
-                    <div class="text-emerald-400 font-bold">24 Mois</div>
-                </div>
-                <div class="glass-card p-4 text-center">
-                    <div class="text-2xl mb-1">🚀</div>
-                    <div class="text-emerald-400 font-bold">SaaS & Mobile</div>
-                </div>
-                <div class="glass-card p-4 text-center">
-                    <div class="text-2xl mb-1">🔓</div>
-                    <div class="text-emerald-400 font-bold">Open Source</div>
-                </div>
+                
+                <!-- Decorative Elements behind -->
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-5 -left-5 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
             </div>
         </section>
 
-        <!-- Section 1: Context (Bento Grid) -->
-        <section id="context" class="animate-fade-up delay-100">
-            <h2 class="text-3xl font-bold text-white mb-8 border-l-4 border-emerald-500 pl-4">Pourquoi ce projet ?</h2>
+        <!-- Section Vision: Health Cards Layout -->
+        <section id="vision" class="animate-fade-up delay-100">
+            <h2 class="text-3xl font-sport font-bold text-white mb-10 section-title">Vision du Produit</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1: Problem -->
-                <div class="glass-card p-8 md:col-span-2 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-red-500/20"></div>
-                    <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                        <span class="text-red-400">⚠</span> Le Verrouillage Propriétaire
-                    </h3>
-                    <p class="text-slate-400 leading-relaxed">
-                        Les solutions actuelles (Everfit, Hexfit) enferment les coachs dans des abonnements coûteux. Les données sportives sont prises en otage et la personnalisation est impossible. Si la plateforme ferme, le business du coach disparaît.
-                    </p>
-                </div>
-
-                <!-- Card 2: Solution -->
-                <div class="glass-card p-8 md:col-span-1 border-emerald-500/30 relative overflow-hidden group">
-                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -ml-10 -mb-10 transition-all group-hover:bg-emerald-500/20"></div>
-                    <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                        <span class="text-emerald-400">💡</span> La Réponse
-                    </h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">
-                        Akhuna est le <strong>"WordPress du Sport"</strong>. Auto-hébergeable, modulaire, gratuit. Le coach possède ses données.
-                    </p>
-                </div>
-
-                <!-- Card 3: Tech Challenge -->
-                <div class="glass-card p-8 md:col-span-3">
-                    <h3 class="text-xl font-bold text-white mb-4">Le Défi Technique</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div>
-                            <div class="text-xs font-mono text-emerald-500 mb-1">BACKEND</div>
-                            <p class="text-slate-300 text-sm">Architecture Micro-services pour scaler la gestion de milliers d'athlètes.</p>
-                        </div>
-                        <div>
-                            <div class="text-xs font-mono text-cyan-500 mb-1">FRONTEND</div>
-                            <p class="text-slate-300 text-sm">Expérience temps-réel (WebSockets) pour le suivi d'entraînement.</p>
-                        </div>
-                        <div>
-                            <div class="text-xs font-mono text-purple-500 mb-1">DEVOPS</div>
-                            <p class="text-slate-300 text-sm">CI/CD complète pour gérer les contributions Open-Source.</p>
-                        </div>
+                <!-- Card 1 -->
+                <div class="glass-panel p-8 group">
+                    <div class="w-12 h-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-lock-key-open"></i>
                     </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Souveraineté des Données</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Contrairement à Everfit ou Hexfit, Akhuna rend les données aux coachs. Pas de lock-in, export total, auto-hébergement possible.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-panel p-8 border-emerald-500/30 bg-emerald-900/10 group">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-barbell"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Outils Pro Gratuits</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Planification périodisée, analyse vidéo frame-by-frame, suivi de charge (RPE). Des outils d'élite, accessibles à tous.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-panel p-8 group">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Architecture Extensible</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        API-First. La communauté peut créer des plugins (Nutrition, Sommeil, Strava Sync) pour enrichir l'écosystème.
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2: Interactive WBS -->
-        <section id="wbs" class="animate-fade-up delay-200">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-slate-800 pb-4">
+        <!-- Section WBS: Interactive Graph -->
+        <section id="structure" class="animate-fade-up delay-200">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8">
                 <div>
-                    <h2 class="text-3xl font-bold text-white border-l-4 border-cyan-500 pl-4 mb-2">Structure WBS</h2>
-                    <p class="text-slate-400 max-w-xl">Explorez l'arbre des tâches. Cliquez sur les segments pour voir les détails des 6 lots de travaux.</p>
+                    <h2 class="text-3xl font-sport font-bold text-white mb-2 section-title">Structure du Projet (WBS)</h2>
+                    <p class="text-slate-400 max-w-xl mt-4">Décomposition technique des 6 lots de travaux majeurs pour l'équipe.</p>
                 </div>
-                <div class="flex gap-2 mt-4 md:mt-0">
-                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-xs text-slate-500">Dev</span>
-                     <span class="w-3 h-3 rounded-full bg-cyan-500"></span><span class="text-xs text-slate-500">Infra</span>
-                     <span class="w-3 h-3 rounded-full bg-purple-500"></span><span class="text-xs text-slate-500">Design</span>
+                <!-- Legend -->
+                <div class="flex gap-3 text-xs font-mono bg-slate-900/50 p-2 rounded-lg border border-white/5">
+                    <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div> Dev</div>
+                    <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Infra</div>
+                    <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-purple-500"></div> Design</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Chart Area -->
-                <div class="lg:col-span-2 glass-card p-1 flex items-center justify-center relative min-h-[450px]">
-                     <!-- Visualization & Content Choices: Plotly Sunburst reused. Configured with 'sunburstcolorway' using vibrant neon colors to contrast with dark background. Font colors set to white. Hover info styled. -->
-                    <div class="chart-container" style="max-width: 100%; height: 450px; max-height: 450px; background: transparent;">
-                        <div id="wbsChart" class="plotly-container"></div>
-                    </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
+                <!-- Graphique -->
+                <div class="lg:col-span-2 glass-panel p-2 flex items-center justify-center relative overflow-hidden">
+                    <div id="wbsChart" class="w-full h-full"></div>
                 </div>
 
-                <!-- Details Panel -->
-                <div class="lg:col-span-1 glass-card p-6 flex flex-col h-full">
-                    <div class="mb-4">
-                        <div class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-2">Détail du module</div>
-                        <h3 id="wbs-title" class="text-2xl font-bold text-emerald-400">Survolez le graphique</h3>
+                <!-- Détails Interactifs -->
+                <div class="lg:col-span-1 glass-panel p-6 flex flex-col relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <i class="ph-fill ph-info text-6xl text-white"></i>
                     </div>
-                    <div class="flex-grow bg-slate-900/50 rounded-lg p-4 border border-slate-700/50 mb-4 overflow-y-auto">
-                        <p id="wbs-desc" class="text-slate-300 leading-relaxed">
-                            Ce graphique représente la décomposition hiérarchique du projet Akhuna. 
-                            <br><br>
-                            Cliquez sur un arc pour zoomer (Drill-down) et voir les sous-tâches spécifiques.
+                    
+                    <div class="mb-6">
+                        <div class="text-xs font-mono text-emerald-400 mb-2 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> SÉLECTION ACTUELLE
+                        </div>
+                        <h3 id="wbs-title" class="text-2xl font-bold text-white leading-tight">Survolez le graphique</h3>
+                    </div>
+                    
+                    <div class="flex-grow bg-slate-950/30 rounded-xl p-4 border border-white/5 overflow-y-auto">
+                        <p id="wbs-desc" class="text-slate-300 text-sm leading-relaxed">
+                            Explorez l'arbre des tâches ci-contre. Chaque segment représente un module critique du développement, de l'infrastructure backend à l'expérience utilisateur mobile.
                         </p>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs font-mono text-center">
-                        <div class="bg-slate-800 rounded py-2 border border-slate-700">Sprint Ready</div>
-                        <div class="bg-slate-800 rounded py-2 border border-slate-700">Assigned</div>
+
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <div class="bg-slate-800/50 p-3 rounded-lg text-center border border-white/5">
+                            <div class="text-xs text-slate-500 uppercase">Priorité</div>
+                            <div class="text-white font-sport font-bold">P1 - High</div>
+                        </div>
+                        <div class="bg-slate-800/50 p-3 rounded-lg text-center border border-white/5">
+                            <div class="text-xs text-slate-500 uppercase">Status</div>
+                            <div class="text-emerald-400 font-sport font-bold">In Progress</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Roadmap & Viz -->
+        <!-- Section Roadmap & Tech -->
         <section id="roadmap" class="animate-fade-up delay-300">
-            <h2 class="text-3xl font-bold text-white mb-12 border-l-4 border-purple-500 pl-4">Roadmap & Allocation</h2>
+            <h2 class="text-3xl font-sport font-bold text-white mb-10 section-title">Roadmap & Ressources</h2>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                
-                <!-- Timeline -->
-                <div class="space-y-8 relative pl-4">
-                    <!-- Vertical Line -->
-                    <div class="absolute top-0 left-[27px] w-0.5 h-full bg-gradient-to-b from-emerald-500 via-cyan-500 to-slate-800"></div>
-
+                <!-- Timeline Verticale Stylisée -->
+                <div class="space-y-0 relative pl-8 border-l-2 border-slate-800">
+                    
                     <!-- Milestone 1 -->
-                    <div class="relative flex items-start gap-6 group">
-                        <div class="z-10 flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] shrink-0">
-                            <span class="font-bold text-emerald-400">S7</span>
-                        </div>
-                        <div class="glass-card p-5 w-full group-hover:border-emerald-500/50 transition-colors">
+                    <div class="relative pb-10 group">
+                        <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-slate-900 border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] z-10"></div>
+                        <div class="glass-panel p-6 group-hover:border-emerald-500/50 transition-colors">
                             <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-lg font-bold text-white">Phase 1 : Définition</h4>
-                                <span class="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-1 rounded border border-emerald-500/30">En Cours</span>
+                                <h4 class="text-lg font-bold text-white">Phase 1 : Définition (S7)</h4>
+                                <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2 py-1 rounded">EN COURS</span>
                             </div>
-                            <p class="text-slate-400 text-sm">Idéation, WBS, Promotion. Recrutement de l'équipe complète (Objectif: 7 membres).</p>
+                            <ul class="text-slate-400 text-sm space-y-1 mt-2">
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-emerald-500"></i> Idéation & WBS</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-emerald-500"></i> Promotion GitHub</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-circle-notch text-blue-400 animate-spin"></i> Recrutement équipe (2/7)</li>
+                            </ul>
                         </div>
                     </div>
 
                     <!-- Milestone 2 -->
-                    <div class="relative flex items-start gap-6 group opacity-70 hover:opacity-100 transition-opacity">
-                        <div class="z-10 flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-600 shrink-0">
-                            <span class="font-bold text-slate-400">S8</span>
-                        </div>
-                        <div class="glass-card p-5 w-full">
+                    <div class="relative pb-10 group opacity-70 hover:opacity-100 transition-opacity">
+                        <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-slate-900 border-2 border-slate-600 z-10"></div>
+                        <div class="glass-panel p-6">
                             <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-lg font-bold text-white">Phase 2 : Planification</h4>
-                                <span class="text-slate-500 text-xs px-2 py-1">Futur</span>
+                                <h4 class="text-lg font-bold text-white">Phase 2 : Conception (S8)</h4>
+                                <span class="text-slate-500 text-xs font-bold px-2 py-1 bg-slate-800 rounded">Q1 2025</span>
                             </div>
-                            <p class="text-slate-400 text-sm">Spécifications techniques détaillées, Maquettes UI/UX, Plan de gestion des risques.</p>
+                            <p class="text-slate-400 text-sm">Design System, Maquettes Figma Mobile & Web, Architecture Backend.</p>
                         </div>
                     </div>
 
                     <!-- Milestone 3 -->
-                    <div class="relative flex items-start gap-6 group opacity-50 hover:opacity-100 transition-opacity">
-                        <div class="z-10 flex items-center justify-center w-14 h-14 rounded-full bg-slate-900 border-2 border-slate-700 shrink-0">
-                            <span class="font-bold text-slate-500">S9</span>
-                        </div>
-                        <div class="glass-card p-5 w-full">
-                            <h4 class="text-lg font-bold text-white mb-1">Phase 3 : Dev & Alpha</h4>
-                            <p class="text-slate-400 text-sm">Développement intensif. Reporting mensuel. Release de la version Alpha.</p>
+                    <div class="relative group opacity-50 hover:opacity-100 transition-opacity">
+                        <div class="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-slate-900 border-2 border-slate-700 z-10"></div>
+                        <div class="glass-panel p-6">
+                            <h4 class="text-lg font-bold text-white mb-1">Phase 3 : Production (S9-S10)</h4>
+                            <p class="text-slate-400 text-sm">Développement itératif, Tests E2E, Release Alpha.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Column -->
+                <!-- Charts Area -->
                 <div class="space-y-6">
-                    <!-- Tech/Team Chart -->
-                    <div class="glass-card p-6">
-                        <h4 class="font-bold text-white mb-4 flex items-center gap-2">
-                            <span class="w-2 h-6 bg-cyan-500 rounded-sm"></span> Répartition des Rôles
-                        </h4>
-                        <div class="chart-container" style="height: 250px;">
+                    <!-- Chart 1: Répartition Rôles -->
+                    <div class="glass-panel p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-white flex items-center gap-2"><i class="ph-fill ph-users text-cyan-400"></i> Squad Composition</h4>
+                        </div>
+                        <div class="chart-wrapper h-[200px]">
                             <canvas id="teamChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Success Criteria -->
-                    <div class="glass-card p-6">
-                        <h4 class="font-bold text-white mb-4 flex items-center gap-2">
-                            <span class="w-2 h-6 bg-emerald-500 rounded-sm"></span> Critères de Sélection
-                        </h4>
-                        <div class="chart-container" style="height: 280px;">
-                            <canvas id="criteriaChart"></canvas>
+                    <!-- Chart 2: Stack Tech Tags (Visuel) -->
+                    <div class="glass-panel p-6">
+                        <h4 class="font-bold text-white mb-4 flex items-center gap-2"><i class="ph-fill ph-stack text-purple-400"></i> Tech Stack</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-cyan-400 border border-cyan-900/50">React.js</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-blue-400 border border-blue-900/50">React Native</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-green-400 border border-green-900/50">Node.js</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-indigo-400 border border-indigo-900/50">PostgreSQL</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-orange-400 border border-orange-900/50">Docker</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-xs text-red-400 border border-red-900/50">GitHub Actions</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Footer Tech Stack -->
-        <section class="border-t border-slate-800 pt-10">
-            <h3 class="text-center text-slate-500 font-mono text-sm mb-6">POWERED BY MODERN STACK</h3>
-            <div class="flex flex-wrap justify-center gap-6 opacity-60 hover:opacity-100 transition-opacity">
-                <span class="px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors cursor-default">React.js</span>
-                <span class="px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors cursor-default">React Native</span>
-                <span class="px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors cursor-default">Node.js</span>
-                <span class="px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors cursor-default">PostgreSQL</span>
-                <span class="px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition-colors cursor-default">Docker</span>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-slate-900 border-t border-slate-800 py-8 text-center text-slate-500 text-sm">
-        <p>&copy; 2025 Akhuna Project. Epitech End of Study Project.</p>
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-8 text-center backdrop-blur-sm">
+        <p class="text-slate-500 text-sm font-mono">&copy; 2025 Akhuna Project. Built for performance.</p>
     </footer>
 
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
+    <!-- Scripts pour les graphiques -->
     <script>
-        // --- DATA (Identical to previous logic, optimized for dark mode) ---
+        // --- DONNÉES SYNCHRONISÉES AVEC LE README.MD ---
         
         const wbsData = {
             ids: [
                 "Akhuna", 
-                "Gestion", "Pilotage", "Reporting", "Communication",
-                "Conception", "Recherche", "Design System", "Maquettes",
-                "Backend", "Infrastructure", "API", "Sécurité",
-                "Web Coach", "Arch Web", "Builder Prgm", "CRM Athlète",
-                "Mobile Athlète", "Arch Mobile", "Player", "Feedback",
-                "Qualité", "DevOps", "Tests", "Documentation"
+                "Gestion", "Pilotage", "Reporting", "Tooling",
+                "Design", "Recherche", "System", "Proto",
+                "Backend", "Infra", "API", "Services",
+                "Web", "ArchFront", "Builder", "CRM",
+                "Mobile", "ArchMob", "Player", "Feedback",
+                "QA", "CI/CD", "Tests", "Docs"
             ],
             labels: [
                 "<b>Akhuna</b>", 
-                "Gestion", "Pilotage", "Reporting", "Comms",
-                "Design", "UX", "UI Kit", "Figma",
-                "Backend", "Infra", "API", "Auth",
-                "Web Coach", "React", "Builder", "CRM",
-                "Mobile", "Native", "Player", "Video",
-                "Qualité", "DevOps", "QA", "Docs"
+                "Gestion<br>Projet", "Pilotage", "Reporting", "Outils",
+                "UX/UI<br>Design", "User<br>Research", "Design<br>System", "Proto<br>Figma",
+                "Backend<br>Arch", "Infra<br>Code", "Core<br>API", "Services<br>Métier",
+                "Web<br>Coach", "Arch<br>SPA", "Prgm<br>Builder", "Dash<br>CRM",
+                "Mobile<br>Athlète", "Arch<br>Native", "Training<br>Player", "Feedback<br>Loop",
+                "QA &<br>DevOps", "CI/CD", "Testing", "Docs"
             ],
             parents: [
                 "", 
                 "Akhuna", "Gestion", "Gestion", "Gestion",
-                "Akhuna", "Conception", "Conception", "Conception",
+                "Akhuna", "Design", "Design", "Design",
                 "Akhuna", "Backend", "Backend", "Backend",
-                "Akhuna", "Web Coach", "Web Coach", "Web Coach",
-                "Akhuna", "Mobile Athlète", "Mobile Athlète", "Mobile Athlète",
-                "Akhuna", "Qualité", "Qualité", "Qualité"
+                "Akhuna", "Web", "Web", "Web",
+                "Akhuna", "Mobile", "Mobile", "Mobile",
+                "Akhuna", "QA", "QA", "QA"
             ],
+            // Descriptions tirées mot pour mot ou résumées du README
             descriptions: {
-                "Akhuna": "Vue d'ensemble du produit : vision, cas d'usage clés et alignement avec les attentes Epitech.",
-                "Gestion": "Organisation globale du projet : rituels Agile, priorisation et suivi des livrables académiques.",
-                "Pilotage": "Suivi de la roadmap, gestion des risques, arbitrage des priorités et alignement avec les jalons S7 à S10.",
-                "Reporting": "Production des comptes-rendus, KPI et livrables attendus pour les suivis et soutenances.",
-                "Communication": "Stratégie de communication interne et externe : canaux, outils et messages clés autour du projet.",
-                "Conception": "Regroupe tout le travail de design produit : parcours utilisateur, maquettes et langage visuel commun.",
-                "Recherche": "Pôle UX : interviews de coachs et d'athlètes, analyse des besoins et définition des personas.",
-                "Design System": "UI Kit : composants réutilisables, tokens (couleurs, typo, spacings) et règles d'accessibilité.",
-                "Maquettes": "Maquettes Figma haute fidélité pour le web et le mobile, utilisées comme référence pour les développeurs.",
-                "Backend": "Conception du domaine métier, modèles de données et services permettant de supporter les fonctionnalités clés.",
-                "Infrastructure": "Choix d'hébergement, bases de données, conteneurisation et ressources nécessaires pour scaler la plateforme.",
-                "API": "Conception et exposition des endpoints REST/GraphQL consommés par le web et le mobile.",
-                "Sécurité": "Gestion de l'authentification, des autorisations, du chiffrement et des bonnes pratiques de protection des données.",
-                "Web Coach": "Interface web dédiée aux coachs pour gérer les athlètes, les programmes et le suivi quotidien.",
-                "Arch Web": "Architecture front : structure React, routing, state management et intégration avec l'API.",
-                "Builder Prgm": "Module de création de programmes : construction visuelle des séances, templates et logique de progression.",
-                "CRM Athlète": "Vue unifiée des athlètes : historique d'entraînement, état d'avancement et communication centralisée.",
-                "Mobile Athlète": "Application utilisée par l'athlète pour exécuter ses séances, suivre ses progrès et remonter du feedback.",
-                "Arch Mobile": "Architecture React Native : navigation, gestion du hors-ligne et synchronisation avec le backend.",
-                "Player": "Lecteur d'exercices et de médias : affichage des consignes, vidéos et minuteries pendant la séance.",
-                "Feedback": "Collecte des ressentis, notes et commentaires des athlètes pour affiner les programmes.",
-                "Qualité": "Stratégie qualité globale : exigences de stabilité, de performance et de maintenabilité du projet.",
-                "DevOps": "Mise en place de la CI/CD, automatisation des déploiements et supervision des environnements.",
-                "Tests": "Tests unitaires, d'intégration et end-to-end pour sécuriser les évolutions et limiter les régressions.",
-                "Documentation": "Rédaction de la documentation technique et fonctionnelle open-source pour faciliter les contributions."
+                "Akhuna": "Ecosystème complet. Survolez les sections pour voir les détails techniques.",
+                "Gestion": "Méthodologie Agile, Sprints et suivi des livrables académiques (Epitech).",
+                "Pilotage": "Définition roadmap, sprints Scrum et gestion des risques.",
+                "Reporting": "Suivi des KPIs vélocité, rapports d'avancement et soutenances.",
+                "Tooling": "Config Jira, GitHub Projects, Notion.",
+                "Design": "Conception centrée utilisateur avant développement.",
+                "Recherche": "Interviews, Personas, User Flows.",
+                "System": "UI Kit complet, tokens, accessibilité.",
+                "Proto": "Maquettes Haute-Fidélité (Figma) Web & Mobile.",
+                "Backend": "Fondations techniques robustes et scalables.",
+                "Infra": "Docker, K8s, Env Dev/Staging/Prod.",
+                "API": "Gateway, Auth JWT, RBAC, Rate Limiting.",
+                "Services": "Gestion Programmes, Médias (S3), Logique métier.",
+                "Web": "Espace de travail du Coach (Productivité).",
+                "Builder": "Drag & Drop complexe, Périodisation, Duplication.",
+                "CRM": "Data viz athlètes, gestion administrative.",
+                "Mobile": "Compagnon d'entraînement de l'Athlète (UX focus).",
+                "Player": "Mode séance temps-réel, Chronos, Input Perf.",
+                "Feedback": "Upload vidéo asynchrone, chat contextuel.",
+                "QA": "Stabilité et Maintenabilité du code Open Source.",
+                "CI/CD": "Pipelines GitHub Actions, Lint, Build auto.",
+                "Tests": "Unitaires, Intégration, E2E (Cypress).",
+                "Docs": "Wiki technique, Swagger API, Guide contrib."
             }
         };
 
         const teamData = {
-            labels: ['Backend', 'Frontend', 'Mobile', 'Lead/Design'],
+            labels: ['Backend & Infra', 'Frontend Web', 'Mobile Dev', 'Product & Design'],
             data: [2, 2, 2, 1],
-            colors: ['#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b'] // Sky, Emerald, Violet, Amber
+            colors: ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b'] // Emerald, Cyan, Violet, Amber
         };
 
-        const criteriaData = {
-            labels: ['Innovation', 'Tech Challenge', 'Présentation', 'Team Fit', 'Réalisme'],
-            data: [90, 85, 95, 80, 75]
-        };
-
-        // --- CHART CONFIGURATION ---
-
-        // Global Chart.js defaults for Dark Mode
-        Chart.defaults.color = '#94a3b8'; // Slate 400
-        Chart.defaults.borderColor = '#1e293b'; // Slate 800
-        Chart.defaults.font.family = "'Inter', sans-serif";
-
+        // --- INIT CHARTS ---
         document.addEventListener('DOMContentLoaded', () => {
             
-            // 1. Plotly Sunburst (WBS)
+            // 1. Plotly Sunburst (WBS) - Style Neon
             const sunburstData = [{
                 type: "sunburst",
                 ids: wbsData.ids,
                 labels: wbsData.labels,
                 parents: wbsData.parents,
-                outsidetextfont: {size: 14, color: "#fff"}, // White text outside
-                insidetextfont: {size: 12, color: "#fff"}, // White text inside
-                leaf: {opacity: 0.8},
-                marker: {line: {width: 2, color: '#0f172a'}}, // Dark borders
+                outsidetextfont: {size: 14, color: "#fff", family: "Inter"},
+                insidetextfont: {size: 11, color: "#fff", family: "Inter"},
+                leaf: {opacity: 0.9},
+                marker: {line: {width: 2, color: '#1e293b'}}, // Dark borders matching glass panel
                 branchvalues: 'total'
             }];
 
             const sunburstLayout = {
                 margin: {l: 0, r: 0, b: 0, t: 0},
-                // Neon palette: Emerald, Cyan, Purple, Pink, Blue
-                sunburstcolorway: ["#10b981", "#06b6d4", "#8b5cf6", "#ec4899", "#3b82f6"],
+                sunburstcolorway: ["#10b981", "#3b82f6", "#8b5cf6", "#f43f5e", "#f59e0b"], // Sporty Palette
                 paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                extendpiecolors: true
+                plot_bgcolor: 'rgba(0,0,0,0)'
             };
 
             const config = {responsive: true, displayModeBar: false};
             
             Plotly.newPlot('wbsChart', sunburstData, sunburstLayout, config).then(gd => {
-                gd.on('plotly_click', function(data){
+                gd.on('plotly_hover', function(data){
                     if(data.points.length > 0) {
                         const point = data.points[0];
                         const cleanLabel = point.label.replace(/<br>/g, ' ').replace(/<b>/g, '').replace(/<\/b>/g, '');
                         
                         document.getElementById('wbs-title').innerText = cleanLabel;
-                        
-                        const desc = wbsData.descriptions[point.id] || 
-                                   `Focus sur le module "${cleanLabel}". Comprend les tâches techniques associées.`;
+                        const desc = wbsData.descriptions[point.id] || "Module technique du projet Akhuna.";
                         document.getElementById('wbs-desc').innerText = desc;
                     }
                 });
             });
 
-            // 2. Chart.js Doughnut (Team)
+            // 2. Chart.js Doughnut (Team) - Style Minimaliste
+            Chart.defaults.font.family = "'Inter', sans-serif";
             new Chart(document.getElementById('teamChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
@@ -492,64 +514,23 @@
                         data: teamData.data,
                         backgroundColor: teamData.colors,
                         borderWidth: 0,
-                        hoverOffset: 10
+                        hoverOffset: 15
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '75%',
                     plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 10, padding: 20 } }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
-                    }
-                }
-            });
-
-            // 3. Chart.js Radar (Criteria)
-            new Chart(document.getElementById('criteriaChart').getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: criteriaData.labels,
-                    datasets: [{
-                        label: 'Score Cible',
-                        data: criteriaData.data,
-                        fill: true,
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)', // Emerald transparent
-                        borderColor: '#10b981', // Emerald solid
-                        pointBackgroundColor: '#10b981',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#10b981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            pointLabels: { font: { size: 12 }, color: '#cbd5e1' }, // Slate 300
-                            ticks: { display: false, backdropColor: 'transparent' },
-                            suggestedMin: 0,
-                            suggestedMax: 100
+                        legend: { 
+                            position: 'right', 
+                            labels: { color: '#94a3b8', boxWidth: 12, padding: 15, font: {size: 11} } 
                         }
                     },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    layout: { padding: 10 }
                 }
             });
-
         });
-
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
     </script>
 </body>
 </html>
