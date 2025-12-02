@@ -9,7 +9,7 @@
 
 ## PROJECT ABSTRACT
 
-**Akhuna** est une solution open-source alternative aux plateformes propriétaires de coaching sportif. Conçue pour briser le verrouillage technologique, elle offre aux entraîneurs une gestion complète et gratuite : planification, analyse de performance et feedback vidéo. Reposant sur une architecture web et mobile modulaire, Akhuna garantit la souveraineté des données et permet un développement communautaire extensible.
+**Akhuna** est une plateforme open-source destinée au coaching sportif moderne. Elle vise à remplacer les solutions propriétaires en offrant une alternative gratuite, modulaire et souveraine, couvrant la planification, le suivi de performance et l'analyse vidéo. Conçue pour être extensible par la communauté, elle s'appuie sur une architecture web et mobile robuste permettant une évolution continue du produit.
 
 ---
 
@@ -23,29 +23,29 @@ Ce découpage structure le développement pour une équipe de 7 ingénieurs sur 
 * **Tooling :** Configuration et maintenance de l'environnement de gestion (Jira, GitHub Projects, Notion).
 
 ### 2. UX/UI DESIGN & CONCEPTION
-* **Recherche Utilisateur :** Analyse des besoins, rédaction des User Stories et définition des flux utilisateurs (User Flows).
-* **Design System :** Création de l'identité visuelle et d'une bibliothèque de composants (UI Kit) cross-platform pour assurer la cohérence.
-* **Prototypage :** Maquettes haute-fidélité (Figma) pour les interfaces Web (Espace Coach) et Mobile (Espace Athlète).
+* **Recherche Utilisateur :** Interviews, analyse des besoins réels des coachs/athlètes, création de personas et définition des parcours utilisateurs.
+* **Design System :** Définition d'un langage visuel complet incluant UI Kit, tokens (typographie, couleurs, espacements) et règles d'accessibilité.
+* **Prototypage :** Production de maquettes haute fidélité dans Figma pour web et mobile, servant de référence pour les équipes de développement.
 
 ### 3. BACKEND ARCHITECTURE & INFRASTRUCTURE
-* **Infrastructure as Code :** Déploiement des environnements (Dev/Staging/Prod), orchestration (Docker) et gestion de la base de données.
-* **Core API Gateway :** Développement des microservices critiques (Authentification JWT, Gestion des droits RBAC).
-* **Services Métiers :** API de gestion des programmes d'entraînement et service de traitement des médias (compression/stockage S3).
+* **Infrastructure as Code :** Définition et automatisation des environnements (Dev/Staging/Prod), conteneurisation et orchestration.
+* **Core API Gateway :** Mise en place des services critiques (authentification, permissions, gestion des comptes) et normalisation des endpoints.
+* **Services Métiers :** Gestion des programmes d'entraînement, traitement des médias (compression, stockage, streaming) et logique métier centrale.
 
 ### 4. WEB CLIENT DEVELOPMENT (COACH SPACE)
-* **Architecture Frontend :** Initialisation du framework SPA (React/Vue), gestion du routing et du state management global.
-* **Program Builder :** Module complexe d'édition de planning (Drag & Drop, cycle de périodisation, duplication).
-* **Dashboard CRM :** Interfaces de visualisation de données (Data viz) et gestion administrative des athlètes.
+* **Architecture Frontend :** Structure SPA, routing, gestion d'état et intégration cohérente avec l'API.
+* **Program Builder :** Outil avancé de création de programmes incluant drag & drop, périodisation et duplication intelligente.
+* **Dashboard CRM :** Vue unifiée des athlètes, data visualisation et outils de gestion administrative.
 
 ### 5. MOBILE CLIENT DEVELOPMENT (ATHLETE SPACE)
-* **Architecture Mobile :** Setup de l'environnement cross-platform (React Native/Flutter) et gestion du mode offline-first.
-* **Training Player :** Interface d'exécution de séance temps-réel (Chronos, Inputs de performance, RPE).
-* **Feedback Loop :** Système de capture et d'upload vidéo asynchrone pour analyse technique par le coach.
+* **Architecture Mobile :** Application cross-platform, gestion du mode hors-ligne et synchronisation fiable avec le backend.
+* **Training Player :** Exécution guidée des séances avec chronos, consignes, interactions et saisies de performance.
+* **Feedback Loop :** Capture vidéo, upload asynchrone et mise à disposition pour analyse technique par les coachs.
 
 ### 6. QUALITY ASSURANCE & DEVOPS
-* **CI/CD Pipelines :** Automatisation des tests, du linting et du déploiement continu via GitHub Actions.
-* **Testing Strategy :** Écriture des tests unitaires (Backend), d'intégration et tests E2E (Parcours critiques).
-* **Documentation :** Rédaction de la documentation technique, API Reference (Swagger) et guides de contribution open-source.
+* **CI/CD Pipelines :** Automatisation complète de la validation, du build, des tests et des déploiements.
+* **Testing Strategy :** Tests unitaires, intégration, E2E et validation continue des parcours critiques.
+* **Documentation :** Rédaction de la documentation technique, guides contributeurs et référence API.
 
 ---
 
